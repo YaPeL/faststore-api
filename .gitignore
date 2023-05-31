@@ -125,3 +125,4 @@ dmypy.json
 
 # Environment variables
 .env
+.idea/
