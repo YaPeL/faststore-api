@@ -1,3 +1,4 @@
+import os
 import databases
 import datetime
 import sqlalchemy
@@ -13,9 +14,6 @@ from sqlalchemy import (
 )
 from app.config import Config
 
-config = Config()
-DATABASE_URL = config.get("SQLALCHEMY_DATABASE_URL")
-database = databases.Database(DATABASE_URL)
 Base: DeclarativeMeta = declarative_base()
 
 
@@ -43,5 +41,9 @@ class Inventory(Base):
     product = relationship("Product", back_populates="inventory", uselist=False)
 
 
-engine = sqlalchemy.create_engine(DATABASE_URL)
-Base.metadata.create_all(engine)
+if os.environ.get("env", "DEV") != "test": # little hack to macke the tests run on github workflows
+    config = Config()
+    DATABASE_URL = config.get("SQLALCHEMY_DATABASE_URL")
+    database = databases.Database(DATABASE_URL)
+    engine = sqlalchemy.create_engine(DATABASE_URL)
+    Base.metadata.create_all(engine)
