@@ -1,4 +1,5 @@
 from pydantic import BaseModel
+from typing import List, Union
 
 
 class ProductBase(BaseModel):
@@ -10,7 +11,7 @@ class ProductBase(BaseModel):
 
 
 class ProductCreate(ProductBase):
-    inventory_quantity: int
+    pass
 
 
 class ProductResponse(ProductBase):
@@ -19,3 +20,15 @@ class ProductResponse(ProductBase):
 
     class Config:
         orm_mode = True
+
+
+class ProductInfoSchema(BaseModel):
+    title: str
+    id: int
+
+
+class GroupedProductSchema(BaseModel):
+    category: Union[str, None]
+    tags: Union[str, None]
+    products: List[ProductInfoSchema]
+
