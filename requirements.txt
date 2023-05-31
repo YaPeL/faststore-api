@@ -1,0 +1,12 @@
+psycopg2
+fastapi[all]
+fastapi-users[sqlalchemy]
+typer
+sqlalchemy
+alembic
+databases[postgresql]
+environs
+black
+flake8
+pytest
+uvicorn
