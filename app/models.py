@@ -30,6 +30,9 @@ class Product(Base):
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
     inventory = relationship("Inventory", back_populates="product", uselist=False, cascade="all, delete")
 
+    @property
+    def inventory_quantity(self):
+        return self.inventory.quantity if self.inventory else 0
 
 class Inventory(Base):
     __tablename__ = "inventory"

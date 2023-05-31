@@ -8,10 +8,12 @@ class ProductBase(BaseModel):
     tags: str
 
 class ProductCreate(ProductBase):
-    pass
+    inventory_quantity: int
+
 
 class ProductResponse(ProductBase):
     id: int
+    inventory_quantity: int
 
     class Config:
         orm_mode = True
