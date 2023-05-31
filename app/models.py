@@ -34,6 +34,7 @@ class Product(Base):
     def inventory_quantity(self):
         return self.inventory.quantity if self.inventory else 0
 
+
 class Inventory(Base):
     __tablename__ = "inventory"
     id = Column(Integer, primary_key=True, index=True)

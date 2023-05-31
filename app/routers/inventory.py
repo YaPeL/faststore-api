@@ -5,6 +5,8 @@ from fastapi import Depends
 
 from app.database import get_db
 from app.models import Inventory, Product
+
+
 router = APIRouter(prefix="/api/v1/inventory",
     tags=["inventory"],
 )

@@ -1,11 +1,13 @@
 from pydantic import BaseModel
 
+
 class ProductBase(BaseModel):
     title: str
     sku: str
     images: str
     category: str
     tags: str
+
 
 class ProductCreate(ProductBase):
     inventory_quantity: int

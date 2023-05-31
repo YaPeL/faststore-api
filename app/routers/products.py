@@ -8,7 +8,7 @@ from fastapi import (
 )
 from pydantic import Field
 from sqlalchemy.orm import Session
-
+from typing import List
 from app.database import get_db
 from app.models import Product, Inventory
 from app.schemas import ProductResponse, ProductCreate
@@ -36,19 +36,21 @@ class OrderBy(str, Enum):
 
 
 @router.get("/{product_id}")
-async def delete_product(product_id: int, db: Session = Depends(get_db)):
+async def delete_product(product_id: int,
+                         response_model=ProductResponse,
+                         db: Session = Depends(get_db)):
     product = db.query(Product).filter(Product.id == product_id).first()
 
     if not product:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Product not found")
 
-    product_schema = ProductResponse.from_orm(product)
-    serialized_product = product_schema.dict()
-    return serialized_product
+    return product
 
 
 @router.post("/")
-async def add_product(product: ProductCreate, db: Session = Depends(get_db)):
+async def add_product(product: ProductCreate,
+                      response_model=ProductResponse,
+                      db: Session = Depends(get_db)):
 
     db_product = Product(**product.dict())
     db.add(db_product)
@@ -59,9 +61,7 @@ async def add_product(product: ProductCreate, db: Session = Depends(get_db)):
     db.add(inventory)
     db.commit()
     db.refresh(inventory)
-    product_schema = ProductResponse.from_orm(db_product)
-    serialized_product = product_schema.dict()
-    return serialized_product
+    return db_product
 
 
 @router.delete("/{product_id}")
@@ -80,6 +80,7 @@ async def delete_product(product_id: int, db: Session = Depends(get_db)):
 @router.get("/")
 async def get_products(sort_by: SortBy = Query(..., description="Grouping type"),
                        order_by: OrderBy = Query(..., description="Sorting type"),
+                       response_model=List[ProductResponse],
                        db: Session = Depends(get_db)):
     if sort_by == SortBy.title:
         if order_by == OrderBy.desc:
@@ -99,6 +100,7 @@ async def get_products(sort_by: SortBy = Query(..., description="Grouping type")
 @router.get("/group")
 async def group_products(group_by: GroupBy = Query(..., description="Grouping type"),
                          order_by: OrderBy = Query(..., description="Sorting type"),
+                         response_model=List[ProductResponse],
                          db: Session = Depends(get_db)):
     if group_by == GroupBy.category:
         if order_by == OrderBy.desc:

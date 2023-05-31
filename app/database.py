@@ -6,6 +6,7 @@ from app.config import Config
 
 config = Config()
 
+
 def get_engine(connect_args=None):
     return create_engine(config.get("SQLALCHEMY_DATABASE_URL"), connect_args=connect_args or dict())
 
