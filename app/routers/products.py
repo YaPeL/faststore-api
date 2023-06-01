@@ -68,18 +68,17 @@ async def delete_product(product_id: int, db: Session = Depends(get_db)):
 async def get_products(sort_by: SortBy = Query(..., description="Grouping type"),
                        order_by: OrderBy = Query(..., description="Sorting type"),
                        db: Session = Depends(get_db)):
+    products = db.query(Product)
     if sort_by == SortBy.title:
-        if order_by == OrderBy.desc:
-            products = db.query(Product).order_by(Product.title.desc())
-        else:
-            products = db.query(Product).order_by(Product.title.asc())
+        sb = Product.title
     elif sort_by == SortBy.created_at:
-        if order_by == OrderBy.desc:
-            products = db.query(Product).order_by(Product.created_at.desc())
-        else:
-            products = db.query(Product).order_by(Product.created_at.asc())
+        sb = Product.created_at
     else:
-        return {"message": "Invalid group_by parameter"}
+        return {"message": "Invalid sort_by parameter"}
+    if order_by == OrderBy.desc:
+        products = products.order_by(sb.desc())
+    else:
+        products = products.order_by(sb.asc())
     return products.all()
 
 
@@ -88,27 +87,16 @@ async def group_products(group_by: GroupBy = Query(..., description="Grouping ty
                          order_by: OrderBy = Query(..., description="Sorting type"),
                          db: Session = Depends(get_db)):
     if group_by == GroupBy.category:
-        if order_by == OrderBy.desc:
-            grouped_products = db.query(Product.category,
-                                        func.json_agg(func.json_build_object('title', Product.title,
-                                                                             'id', Product.id))
-                                        .label('products')).group_by(Product.category).order_by(Product.category.desc())
-        else:
-            grouped_products = db.query(Product.category,
-                                        func.json_agg(func.json_build_object('title', Product.title,
-                                                                             'id', Product.id))
-                                        .label('products')).group_by(Product.category).order_by(Product.category.asc())
+        qb = Product.category
     elif group_by == GroupBy.tags:
-        if order_by == OrderBy.desc:
-            grouped_products = db.query(Product.tags,
-                                        func.json_agg(func.json_build_object('title', Product.title,
-                                                                             'id', Product.id))
-                                        .label('products')).group_by(Product.tags).order_by(Product.tags.desc())
-        else:
-            grouped_products = db.query(Product.tags,
-                                        func.json_agg(func.json_build_object('title', Product.title,
-                                                                             'id', Product.id))
-                                        .label('products')).group_by(Product.tags).order_by(Product.tags.asc())
+        qb = Product.tags
     else:
         return {"message": "Invalid group_by parameter"}
+    grouped_products = db.query(qb,
+                                func.json_agg(func.json_build_object('title', Product.title,
+                                                                     'id', Product.id)).label('products')).group_by(qb)
+    if order_by == OrderBy.desc:
+        grouped_products = grouped_products.order_by(qb.desc())
+    else:
+        grouped_products = grouped_products.order_by(qb.asc())
     return grouped_products.all()
