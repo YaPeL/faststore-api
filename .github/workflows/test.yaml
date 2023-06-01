@@ -33,6 +33,7 @@ jobs:
     - name: Test with pytest
       env:
         env: test
+        SQLALCHEMY_DATABASE_URL: "postgresql://postgres:postgres@localhost/db"
       run: |
         pip3 install -r test-requirements.txt
         pytest app/tests/
