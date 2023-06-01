@@ -35,4 +35,4 @@ jobs:
         env: test
       run: |
         pip3 install -r test-requirements.txt
-        pytest tests/
+        pytest app/tests/
